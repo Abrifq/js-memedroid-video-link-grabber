@@ -82,6 +82,6 @@ When [redirect](#redirect) argument is present, this will be used instead of [th
 
 Used when the given [link](#link) is not in memedroid site.
 
-### 404: Meme is does not have video
+### 404: Meme does not have video
 
 When given meme does not have a video.
