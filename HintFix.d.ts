@@ -1,0 +1,1 @@
+export type Hint<Hinted, SuperType> = Hinted | Omit<Hinted, SuperType>;

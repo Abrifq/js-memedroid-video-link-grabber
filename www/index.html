@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+    <meta charset="utf-8">
+    <title>Memedroid Video Grabber API - Playground</title>
+    <script>
+        const makeError = err =>
+            `<p style="color:red;font-weight:bolder;">${err}</p>`;
+
+        function getMeme(link) {
+            if (!link) return;
+
+            const url = new URL("./api", document.location); //too lazy to enforce localhost, lmao.
+            url.searchParams.append("link", link);
+            fetch(url, { headers: { "Accept": "text/html" } })
+                .then(response => {
+                    switch (response.status) {
+                        case 403: return makeError("The link you gave does not belong to a post on Memedroid. Please only use Memedroid links.<br>Here is an example link: <a href=\"https://www.youtube.com/watch?v=dQw4w9WgXcQ\">https://www.memedroid.com/memes/detail/42069/Never-gonna-give-you-up</a>");
+                        case 404: return makeError("The link you gave does not have a video.");
+                        default: return response.text();
+                    }
+                }).catch((err) => makeError("Something real bad happened. Error: " + err))
+                .then(text => {
+                    const responseContainer = document.createElement("span");
+                    const containerContainer = document.getElementById("append-meme");
+                    responseContainer.innerHTML = text; //XSS time, lol
+                    containerContainer.prepend(responseContainer);
+                });
+        }
+    </script>
+</head>
+
+<body>
+    <p>
+        Sauce:
+        <a href="https://github.com/Abrifq/js-memedroid-video-link-grabber">
+            Abrifq/js-memedroid-video-link-grabber
+        </a>
+    </p>
+    <form method="dialog" onsubmit="getMeme(this.link.value);">
+        <fieldset>
+            <legend>Memedroid Video Link Grabber</legend>
+            <label>Video Meme Link:
+                <input type="url" name="link" placeholder="https://www.memedroid.com/memes/detail/..." />
+            </label>
+            <input type="submit" value="Steal thy meme!">
+        </fieldset>
+    </form>
+    <div id="append-meme"></div>
+</body>
+
+</html>

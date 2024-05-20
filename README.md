@@ -1,87 +1,125 @@
 # Memedroid Video Link Grabber
 
+TODO: propose a proper api and release this lmao
+
 That's it. It grabs the video link.
 In linkedIn terms, it's a Software as a Service that gets file from a highly active website -- i dunno. lol.
 
-Uses nodeJS.
+Both npm and browser (as ES6 module) compliant.
 
-## Parameters
+## Methods
 
-### `link`
+### In "minimal" Script
 
-The url to the meme.
+Has enough methods to **steal the meme**!
 
-### `returns`
+#### isVideoMeme
 
-Chooses response text's structure for API consumers.
-Ignored when `redirect` argument is present.
+`isVideoMeme( webpage: string )=>boolean`
 
-Can be "xml" (or "html"), "json" or "raw".
-If this is not supplied, `Accept` header will be used. (`application/xml`, `text/html`, `application/json` or `text/plain`)
+Scrapes the webpage data to see if the meme is a video/gif meme or not.
 
-### `preferWebm`
+#### getMediaBase
 
-When present, the default video link will be webm.
+`getMediaBase( webpage: string )=>string`
 
-### `redirect`
+Scrapes the webpage data to get the media url base.
 
-When present, instead of returning a response text, the API will simply redirect the request to the video link.
+### In "core" Script
 
-## Return Values
+Has methods to get information about the meme.
+Also includes [minimal script](#in-minimal-script)!
 
-It's a barebone api so it doesn't start a web server as a module. Use app.js to launch the web server.
+#### getAuthor
 
-### 200: Video Found
+`getAuthor( webpage: string )=>Author`
 
-Use [returns](#returns) argument to specify a format.
+Scrapes webpage data to get [`Author`](#author) data.
 
-- JSON Format:
-  
-  ```json
-  {
-  "authorURL": "meme author's profile's URL",
-  "authorName": "meme author's name, for archival purposes.",
-  "memeTitle": "meme's title",
-  "videoLink": "video's link. mp4 by default. use preferWebm to make this field webm.",
-  "videoLinks": {
-        "webm":"webm video link",
-        "mp4":"mp4 video link"
-    },
-  "thumbnailURL":"video thumbnail's URL"
-  }
-  ```
+#### getTitle
 
-- XML/HTML Format:
+`getTitle( webpage: string )=>string`
 
-  ```html
-  <div data-status="success">
-    <video controls autoplay="no" poster="{video thumbnail url}">
-    <source id="webm-source" src="{webm video link}" type="video/webm" />
-    <source id="mp4-source" src="{mp4 video link}" type="video/mp4" />
-    </video><br>
-    <p>
-        <span id="meme-title">{meme title}</span>
-        Posted by: <a id="author" href="{author profile url}" >{author name}
-    </p>
-    <span>
-        <a download="{meme title}.mp4" href=".?redirect"><button> Download MP4 </button><a>
-        <a download="{meme title}.webm" href=".?redirect&preferWebm"><button> Download WEBM </button><a>
-    </span>
-  </div>
-  ```
+Scrapes webpage data to get meme's title.
 
-- Raw Text format:
+### In "full" Script
 
-  `{chosen video url}`
+Has utility functions to validate incoming url and create API responses.
 
-### 302: Redirect to Video
+Also includes [minimal](#in-minimal-script) and [core](#in-core-script) scripts!
 
-When [redirect](#redirect) argument is present, this will be used instead of [the normal response](#200-video-found).
+#### isAllowedHost
 
-### 400: Not a memedroid link
+`isAllowedHost( url: string )=>boolean`
 
-Used when the given [link](#link) is not in memedroid site.
+The given url's hostname is checked against the known MemeDroid hosts. Returns `true` when it matches a known host.
 
-### 404: Meme does not have video
+#### isValidURL
 
-When given meme does not have a video.
+`isValidURL( url: string )=>boolean`
+
+The given url's path is checked if it's a valid post url.
+
+Returns `false` when the path shouldn't point to a post.
+
+#### buildMetadata
+
+`buildMetadata( baseLink: string, author: Author, title: string, hasVideo: boolean )=>MemeMetadata`
+
+Builds the metadata with the scraped data.
+Get parts from here:
+
+- baseLink: [getMediaBase](#getmediabase)
+- author: [getAuthor](#getauthor)
+- title: [getTitle](#gettitle)
+- hasVideo: [isVideoMeme](#isvideomeme)
+
+#### makeMetadata
+
+`makeMetadata( webpage: string )=>MemeMetadata`
+
+Scrapes and builds the metadata from the webpage data.
+
+#### getDownloadURLUnsafe
+
+`getDownloadURLUnsafe( baseLink: string, extension: string )=>string`
+
+Returns a direct link to get the meme image or video.
+**WARNING**: This function won't check if the wanted extension is valid. Use [getDownloadURL](#getdownloadurl) if you need to be error-prone.
+
+#### getDownloadURL
+
+`getDownloadURL( metadata:MemeMetadata, extension: string )=>string`
+
+Returns a direct link to get meme image or video.
+
+If this method gets out of date at any time, use [the unsafe variant](#getdownloadurlunsafe).
+
+## Types
+
+### Author
+
+Holds information about the post's original poster. (OP)
+
+Properties:
+
+- `name` : `string`
+  Username of the OP.
+- `url` : `string`
+  Profile url of the OP.
+
+### MemeMetadata
+
+Holds metadata values to be used in an API response.
+
+Properties:
+
+- `title` : `string`
+  Title of the meme.
+- `author` : [`Author`](#author)
+  Holds value of the author of this meme.
+- `baseLink` : `string`
+  The media base link that allows you to access multiple file variations of the meme. See [getMediaBase](#getmediabase).
+- `hasVideo` : `boolean`
+  If `true`, the meme is a video or a gif.
+  If `false`, the meme is a photo and trying to get video formats should fail.

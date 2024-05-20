@@ -1,0 +1,27 @@
+{
+  "name": "memedroid-video-link-grabber",
+  "version": "1.0.0",
+  "description": "Grab video links from Memedroid posts",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Abrifq/js-memedroid-video-link-grabber.git"
+  },
+  "keywords": [
+    "memedroid",
+    "meme",
+    "rest",
+    "api",
+    "scraper"
+  ],
+  "author": "Abrifq",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Abrifq/js-memedroid-video-link-grabber/issues"
+  },
+  "homepage": "https://github.com/Abrifq/js-memedroid-video-link-grabber#readme",
+  "type": "module"
+}

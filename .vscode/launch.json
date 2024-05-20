@@ -1,0 +1,17 @@
+{
+    "configurations": [
+        {
+            "args": [
+                "--abort-on-uncaught-exception",
+                ""
+            ],
+            "name": "Launch Program",
+            "program": "${workspaceFolder}/play.js",
+            "request": "launch",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "type": "node"
+        }
+    ]
+}
